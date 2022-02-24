@@ -1,5 +1,15 @@
 version: 2.1
 
+# Define a filter that matches tags and not branches.
+tags-only-filter: &tags-only-filter
+  filters:
+    tags:
+      only:
+        - /.*/
+    branches:
+      ignore:
+        - /.*/
+
 orbs:
   win: circleci/windows@2.4.0
 
@@ -13,6 +23,15 @@ workflows:
       - test_3_10
       - test_win
       - test_package
+      - publish:
+          <<: *tags-only-filter
+          requires:
+            - test_3_6
+            - test_3_7
+            - test_3_8
+            - test_3_9
+            - test_win
+            - test_package
 
 jobs:
   test_3_7: &test_template
@@ -132,3 +151,17 @@ jobs:
           command: |
             ./venv/bin/pip --disable-pip-version-check show MozPhab
             ./venv/bin/moz-phab version
+  publish:
+    docker:
+      - image: circleci/python:3.7
+    working_directory: ~/repo
+    steps:
+    - checkout
+    - run:
+        name: build
+        # Generate packages and upload to PyPI via `twine`.
+        command: |
+            python setup.py sdist bdist_wheel
+            sudo pip install pipenv
+            pipenv install twine
+            pipenv run twine upload --repository pypi dist/*
