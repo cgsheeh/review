@@ -9,7 +9,7 @@ import pytest
 from contextlib import contextmanager
 from immutabledict import immutabledict
 
-from mozphab import diff, exceptions, mozphab, repository, simplecache
+from mozphab import diff, exceptions, mozphab, repository
 
 from mozphab.conduit import conduit, ConduitAPIError
 
@@ -187,7 +187,6 @@ def get_revs():
 
 @pytest.fixture
 def m_call(request):
-    request.addfinalizer(simplecache.cache.reset)
     with mock.patch("mozphab.conduit.ConduitAPI.call") as xmock:
         yield xmock
 

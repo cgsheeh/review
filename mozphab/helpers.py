@@ -3,6 +3,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import functools
 import json
 import os
 import re
@@ -22,7 +23,6 @@ from shutil import which
 from mozphab import environment
 
 from .logger import logger
-from .simplecache import cache
 
 
 # If a commit body matches **all** of these, reject it.  This is to avoid the
@@ -161,11 +161,9 @@ def temporary_binary_file(content):
         os.remove(f.name)
 
 
+@functools.lru_cache(maxsize=128)
 def get_arcrc_path():
     """Return a path to the user's Arcanist configuration file."""
-    if "arcrc" in cache:
-        return cache.get("arcrc")
-
     if environment.IS_WINDOWS:
         arcrc = os.path.join(os.getenv("APPDATA", ""), ".arcrc")
     else:
@@ -174,7 +172,6 @@ def get_arcrc_path():
             logger.debug("Changed file permissions on the %s file.", arcrc)
             os.chmod(arcrc, 0o600)
 
-    cache.set("arcrc", arcrc)
     return arcrc
 
 

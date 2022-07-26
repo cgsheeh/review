@@ -4,6 +4,7 @@
 
 import base64
 import datetime
+import functools
 import hashlib
 import json
 import os
@@ -26,7 +27,6 @@ from .helpers import (
     strip_differential_revision,
 )
 from .logger import logger
-from .simplecache import cache
 
 
 CHECK_IN_NEEDED = "check-in_needed"
@@ -59,6 +59,11 @@ class ConduitAPIError(Error):
 class ConduitAPI:
     def __init__(self):
         self.repo = None
+        self.api_token = None
+        self.revisions = {}
+        self.users = {}
+        self.groups = {}
+        self.whoami = None
 
     def set_repo(self, repo):
         self.repo = repo
@@ -73,16 +78,17 @@ class ConduitAPI:
         Returns:
             API Token string
         """
-
-        if "api_token" in cache:
-            return cache.get("api_token")
+        if self.api_token:
+            return self.api_token
 
         token = read_json_field(
             [get_arcrc_path()], ["hosts", self.repo.api_url, "token"]
         )
         if not token:
             raise ConduitAPIError(environment.INSTALL_CERT_MSG)
-        cache.set("api_token", token)
+
+        self.api_token = token
+
         return token
 
     def save_api_token(self, token):
@@ -250,9 +256,9 @@ class ConduitAPI:
             ids = [str(rev_id) for rev_id in ids]
             phids_by_id = dict(
                 [
-                    (rev_id, cache.get("rev-id-%s" % rev_id))
+                    (rev_id, self.revisions.get("rev-id-%s" % rev_id))
                     for rev_id in ids
-                    if "rev-id-%s" % rev_id in cache
+                    if "rev-id-%s" % rev_id in self.revisions
                 ]
             )
             found_phids = list(phids_by_id.values())
@@ -265,14 +271,16 @@ class ConduitAPI:
             phids_by_id = {}
             found_phids = phids.copy()
             query_field = "phids"
-            query_values = set([phid for phid in phids if "rev-%s" % phid not in cache])
+            query_values = set(
+                [phid for phid in phids if "rev-%s" % phid not in self.revisions]
+            )
 
         # Revisions metadata keyed by PHID.
         revisions = dict(
             [
-                (phid, cache.get("rev-%s" % phid))
+                (phid, self.revisions.get("rev-%s" % phid))
                 for phid in found_phids
-                if "rev-%s" % phid in cache
+                if "rev-%s" % phid in self.revisions
             ]
         )
 
@@ -288,8 +296,8 @@ class ConduitAPI:
             for r in rev_list:
                 phids_by_id[str(r["id"])] = r["phid"]
                 revisions[r["phid"]] = r
-                cache.set("rev-id-%s" % r["id"], r["phid"])
-                cache.set("rev-%s" % r["phid"], r)
+                self.revisions["rev-id-%s" % r["id"]] = r["phid"]
+                self.revisions["rev-%s" % r["phid"]] = r
 
         # Return revisions in the same order requested.
         if ids:
@@ -415,8 +423,8 @@ class ConduitAPI:
         for user in usernames:
             u = user.rstrip("!")
             key = "user-%s" % u
-            if key in cache:
-                users.append(cache.get(key))
+            if key in self.users:
+                users.append(self.users.get(key))
             else:
                 to_collect.append(u)
 
@@ -431,8 +439,8 @@ class ConduitAPI:
         for user in response:
             users.append(user)
             key = "user-%s" % user["userName"]
-            cache.set(key, user)
-            cache.set(user["phid"], key)
+            self.users[key] = user
+            self.users[user["phid"]] = key
 
         return users
 
@@ -442,8 +450,8 @@ class ConduitAPI:
         for slug in slugs:
             s = slug.rstrip("!")
             key = "group-%s" % s
-            if key in cache:
-                groups.append(cache.get(key))
+            if key in self.groups:
+                groups.append(self.groups.get(key))
             else:
                 to_collect.append(s)
 
@@ -457,7 +465,7 @@ class ConduitAPI:
             group = dict(name=data["fields"]["slug"], phid=data["phid"])
             groups.append(group)
             key = "group-%s" % group["name"]
-            cache.set(key, group)
+            self.groups[key] = group
 
         # projects might be received by an alias.
         maps = response["maps"]["slugMap"]
@@ -465,9 +473,9 @@ class ConduitAPI:
             name = normalise_reviewer(alias)
             group = dict(name=name, phid=maps[alias]["projectPHID"])
             key = "group-%s" % alias
-            if key not in cache:
+            if key not in self.groups:
                 groups.append(group)
-                cache.set(key, group)
+                self.groups[key] = group
 
         return groups
 
@@ -626,29 +634,20 @@ class ConduitAPI:
 
         return revision
 
+    @functools.lru_cache(maxsize=None)
     def get_repository(self, call_sign):
         """Get the repository info from Phabricator."""
-        key = "repo-%s" % call_sign
-        if key in cache:
-            return cache.get(key)
-
         api_call_args = dict(constraints=dict(callsigns=[call_sign]), limit=1)
         data = self.call("diffusion.repository.search", api_call_args)
         if not data.get("data"):
             raise NotFoundError("Repository %s not found" % call_sign)
 
         repo = data["data"][0]
-        cache.set(key, repo)
         return repo
 
+    @functools.lru_cache(maxsize=None)
     def get_repositories_with_tag(self, tag: str) -> dict:
         """Get repository information for repos associated with the given tag."""
-        key = f"repos-tag-{tag}"
-
-        entry = cache.get(key)
-        if entry:
-            return entry
-
         api_call_args = {
             "constraints": {
                 "projects": [tag],
@@ -659,7 +658,6 @@ class ConduitAPI:
         if not data:
             raise NotFoundError(f"No repositories found with tag {tag}")
 
-        cache.set(key, data)
         return data
 
     def create_diff(self, changes, base_revision):
@@ -745,12 +743,11 @@ class ConduitAPI:
         return file_phid
 
     def whoami(self, *, api_token=None):
-        if "whoami" in cache:
-            return cache.get("whoami")
+        if self.whoami:
+            return self.whoami
 
-        who = self.call("user.whoami", {}, api_token=api_token)
-        cache.set("whoami", who)
-        return who
+        self.whoami = self.call("user.whoami", {}, api_token=api_token)
+        return self.whoami
 
     def update_revision_reviewers(self, transactions, commit):
         # Appends differential.revision.edit transaction(s) to `transactions` to

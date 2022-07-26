@@ -15,7 +15,6 @@ from mozphab import (
     exceptions,
     helpers,
     mozphab,
-    simplecache,
     subprocess_wrapper,
 )
 
@@ -294,27 +293,10 @@ def test_get_users_with_user(m_conduit):
     conduit.get_users(["alice"])
     m_conduit.assert_called_once()
 
-    simplecache.cache.reset()
     m_conduit.reset_mock()
     m_conduit.return_value = []
     assert [] == conduit.get_users(["alice"])
     m_conduit.assert_called_once()
-
-
-def test_simple_cache():
-    cache = simplecache.SimpleCache()
-    assert cache.get("nothing") is None
-
-    cache.set("something", 123)
-    assert cache.get("something") == 123
-
-    assert cache.get("SoMeThInG") == 123
-
-    cache.set("something", "foo")
-    assert cache.get("something") == "foo"
-
-    cache.delete("something")
-    assert cache.get("something") is None
 
 
 @mock.patch("subprocess.check_output")
@@ -443,7 +425,6 @@ def test_get_arcrc_path(m_getenv, m_chmod, m_stat, m_isfile, m_join, m_expand):
     m_isfile.return_value = True
 
     m_chmod.reset_mock()
-    simplecache.cache.reset()
     arcrc()
     m_chmod.assert_not_called()
 
@@ -452,7 +433,6 @@ def test_get_arcrc_path(m_getenv, m_chmod, m_stat, m_isfile, m_join, m_expand):
     m_join.reset_mock()
     m_getenv.side_effect = ("/app_data",)
     stat.st_mode = 0o100640
-    simplecache.cache.reset()
     arcrc()
     if environment.IS_WINDOWS:
         m_getenv.assert_called_once_with("APPDATA", "")
