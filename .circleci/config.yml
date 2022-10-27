@@ -14,6 +14,16 @@ tags-only-filter: &tags-only-filter
       ignore:
         - /.*/
 
+# Define a filter that matches tags and branches.
+branches-and-tags-filter: &branches-only-filter
+  filters:
+    tags:
+      only:
+        - /.*/
+    branches:
+      only:
+        - /.*/
+
 orbs:
   win: circleci/windows@2.4.0
 
@@ -21,12 +31,18 @@ workflows:
   version: 2
   test:
     jobs:
-      - test_3_7
-      - test_3_8
-      - test_3_9
-      - test_3_10
-      - test_win
-      - test_package
+      - test_3_7:
+          <<: *branches-and-tags-filter
+      - test_3_8:
+          <<: *branches-and-tags-filter
+      - test_3_9:
+          <<: *branches-and-tags-filter
+      - test_3_10:
+          <<: *branches-and-tags-filter
+      - test_win:
+          <<: *branches-and-tags-filter
+      - test_package:
+          <<: *branches-and-tags-filter
       - publish:
           <<: *tags-only-filter
           requires:
