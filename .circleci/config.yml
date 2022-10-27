@@ -15,7 +15,7 @@ tags-only-filter: &tags-only-filter
         - /.*/
 
 # Define a filter that matches tags and branches.
-branches-and-tags-filter: &branches-only-filter
+branches-and-tags-filter: &branches-and-tags-filter
   filters:
     tags:
       only:
