@@ -141,9 +141,9 @@ def self_upgrade():
 
         try:
             check_call(command)
-        except Exception:
+        except Exception as e:
             temp_exe.rename(exe)
-            raise
+            raise e
 
         if not exe.is_file():
             # moz-phab.exe is not created - install wasn't needed.
