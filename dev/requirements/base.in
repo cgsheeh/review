@@ -9,7 +9,7 @@ immutabledict==1.0.0
 mock==3.0.5
 packaging==21.3
 pbr==5.4.3
-pytest==7.1.1
+pytest==7.2.0
 python-hglib>=2.6.2
 scandir==1.10.0
 hg-evolve==10.2.0.post1
