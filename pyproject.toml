@@ -34,6 +34,10 @@ dynamic = ["version"]
 # TODO Is this right?
 # zip_safe = false
 
+[project.urls]
+"Repository" = "https://github.com/mozilla-conduit/review"
+"Bug Tracker" = "https://bugzilla.mozilla.org"
+
 [project.scripts]
 moz-phab = "mozphab.mozphab:run"
 # TODO with setup.py this doesn't ship to users, only in development mode.
