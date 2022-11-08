@@ -25,7 +25,7 @@ dependencies = [
 # TODO the below entries in `project` are probably wrong.
 
 # TODO Is this the right way to do package data?
-package_data = {"mozphab": ["metrics.yaml", "pings.yaml"]}
+package_data = {"mozphab" = ["metrics.yaml", "pings.yaml"]}
 packages = ["mozphab", "mozphab/commands"]
 
 # TODO Is this right?
