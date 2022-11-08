@@ -22,8 +22,6 @@ dependencies = [
     # TODO can we get rid of this setuptools on pyproject??
     "setuptools",
 ]
-# TODO is this right?
-include_package_data = true
 
 # TODO the below entries in `project` are probably wrong.
 
