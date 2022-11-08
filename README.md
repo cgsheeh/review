@@ -373,13 +373,7 @@ $ docker-compose -f docker-compose.yml -f docker-compose.review.yml run local-de
 
 To cut a new release of `moz-phab`:
 
-1. Increase the version number in `setup.py` and push the change to GitHub.
-
-    ```shell
-    git push origin main
-    ```
-
-2. Create a tag matching the version number. This will kick off CircleCI jobs
+1. Create a tag matching the version number. This will kick off CircleCI jobs
    to generate the release and push it to PyPI.
 
     ```shell
@@ -387,7 +381,7 @@ To cut a new release of `moz-phab`:
     git push origin 1.2.0
     ```
 
-3. Post about the new release in the following channels:
+2. Post about the new release in the following channels:
 
     - https://wiki.mozilla.org/MozPhab/Changelog
     - https://discourse.mozilla.org/c/firefox-tooling-announcements
