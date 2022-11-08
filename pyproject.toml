@@ -37,4 +37,10 @@ moz-phab = "mozphab.mozphab:run"
 # TODO with setup.py this doesn't ship to users, only in development mode.
 moz-phab-dev = "mozphab.mozphab:run_dev"
 
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = [
+    "setuptools",
+]
+
 # TODO use setuptools-scm
