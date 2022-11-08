@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 [project]
-name = "mozphab"
+name = "MozPhab"
 description = "Phabricator review submission/management tool."
 # Note: please change the `updater.py::check_for_updates` method if the format
 # would be different than `>=x.y`.
@@ -29,7 +29,6 @@ dynamic = ["version"]
 
 # TODO Is this the right way to do package data?
 # package_data = {"mozphab" = ["metrics.yaml", "pings.yaml"]}
-
 
 # TODO Is this right?
 # zip_safe = false
