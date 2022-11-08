@@ -19,7 +19,6 @@ dependencies = [
     "packaging",
     "python-hglib>=2.6.2",
     "sentry-sdk>=0.14.3",
-    # TODO can we get rid of this setuptools on pyproject??
     "setuptools",
 ]
 
