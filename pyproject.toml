@@ -6,11 +6,11 @@
 name = "mozphab"
 version = "1.1.0"
 description = "Phabricator review submission/management tool."
-# note: please change the `updater.py::check_for_updates` method if the format
-# would be different than > = x.y
+# Note: please change the `updater.py::check_for_updates` method if the format
+# would be different than `>=x.y`.
 requires-python = ">=3.7"
 license = {file = "LICENSE"}
-authors = [{name = "mozilla", email = "conduit-team@mozilla.com"}]
+authors = [{name = "Mozilla", email = "conduit-team@mozilla.com"}]
 readme = "README.md"
 url = "https://github.com/mozilla-conduit/review"
 dependencies = [
