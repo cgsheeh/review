@@ -5,13 +5,13 @@
 [project]
 name = "mozphab"
 version = "1.1.0"
+description = "Phabricator review submission/management tool."
 # note: please change the `updater.py::check_for_updates` method if the format
 # would be different than > = x.y
-requires-python = "> = 3.7"
-authors = [{name = "mozilla", email = "conduit-team@mozilla.com"}]
-description = "Phabricator review submission/management tool."
-readme = "README.md"
+requires-python = ">=3.7"
 license = {file = "LICENSE"}
+authors = [{name = "mozilla", email = "conduit-team@mozilla.com"}]
+readme = "README.md"
 url = "https://github.com/mozilla-conduit/review"
 dependencies = [
     "distro",
@@ -24,6 +24,9 @@ dependencies = [
 ]
 # TODO is this right?
 include_package_data = true
+
+# TODO the below entries in `project` are probably wrong.
+
 # TODO Is this the right way to do package data?
 package_data = {"mozphab": ["metrics.yaml", "pings.yaml"]}
 packages = ["mozphab", "mozphab/commands"]
