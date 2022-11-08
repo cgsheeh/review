@@ -50,7 +50,7 @@ MOZPHAB_NAME = "MozPhab"  # PyPi package name
 
 def _get_mozphab_version():
     try:
-        return version("package-name")
+        return version("mozphab")
     except PackageNotFoundError:
         # package is not installed
         return "0.0.0"
