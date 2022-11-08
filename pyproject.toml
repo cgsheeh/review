@@ -39,7 +39,10 @@ moz-phab-dev = "mozphab.mozphab:run_dev"
 [build-system]
 build-backend = "setuptools.build_meta"
 requires = [
-    "setuptools",
+    "setuptools>=45",
+    "setuptools_scm[toml]>=7.0.5",
 ]
 
-# TODO use setuptools-scm
+# Derive version number from version control.
+[tool.setuptools_scm]
+
