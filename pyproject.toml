@@ -15,7 +15,7 @@ readme = "README.md"
 url = "https://github.com/mozilla-conduit/review"
 dependencies = [
     "distro",
-    "glean-sdk>= 50.0.1,== 50.*",
+    "glean-sdk>=50.0.1,==50.*",
     "packaging",
     "python-hglib>=2.6.2",
     "sentry-sdk>=0.14.3",
