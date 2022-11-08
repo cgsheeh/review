@@ -30,9 +30,6 @@ dynamic = ["version"]
 # TODO Is this the right way to do package data?
 # package_data = {"mozphab" = ["metrics.yaml", "pings.yaml"]}
 
-# May no longer be required:
-# https://setuptools.pypa.io/en/latest/userguide/quickstart.html#package-discovery
-packages = ["mozphab", "mozphab/commands"]
 
 # TODO Is this right?
 # zip_safe = false
@@ -49,6 +46,12 @@ requires = [
     "setuptools_scm[toml]>=7.0.5",
 ]
 
+[tool.setuptools]
+# May no longer be required:
+# https://setuptools.pypa.io/en/latest/userguide/quickstart.html#package-discovery
+packages = ["mozphab", "mozphab.commands"]
+
 # Derive version number from version control.
 [tool.setuptools_scm]
+
 
