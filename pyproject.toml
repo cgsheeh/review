@@ -12,7 +12,7 @@ requires-python = ">=3.7"
 license = {file = "LICENSE"}
 authors = [{name = "Mozilla", email = "conduit-team@mozilla.com"}]
 readme = "README.md"
-url = "https://github.com/mozilla-conduit/review"
+# url = "https://github.com/mozilla-conduit/review"
 dependencies = [
     "distro",
     "glean-sdk>=50.0.1,==50.*",
@@ -25,14 +25,14 @@ dependencies = [
 # TODO the below entries in `project` are probably wrong.
 
 # TODO Is this the right way to do package data?
-package_data = {"mozphab" = ["metrics.yaml", "pings.yaml"]}
+# package_data = {"mozphab" = ["metrics.yaml", "pings.yaml"]}
 
 # May no longer be required:
 # https://setuptools.pypa.io/en/latest/userguide/quickstart.html#package-discovery
 packages = ["mozphab", "mozphab/commands"]
 
 # TODO Is this right?
-zip_safe = false
+# zip_safe = false
 
 [project.scripts]
 moz-phab = "mozphab.mozphab:run"
