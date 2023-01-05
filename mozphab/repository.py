@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import argparse
 import json
 import os
 import urllib.parse
@@ -25,7 +26,7 @@ from .spinner import wait_message
 
 
 class Repository(object):
-    def __init__(self, path, dot_path, phab_url=None):
+    def __init__(self, path: str, dot_path: str, phab_url: Optional[str] = None):
         self._phid = None
         self._phab_repo = None
         self._phab_vcs = None
@@ -48,7 +49,7 @@ class Repository(object):
         ):
             raise Error("Only https connections are allowed.")
 
-    def is_worktree_clean(self):
+    def is_worktree_clean(self) -> bool:
         """Check if the working tree is clean."""
 
     def before_submit(self):
@@ -57,12 +58,12 @@ class Repository(object):
     def after_submit(self):
         """Executed after the submit commit."""
 
-    def _get_setting(self, key):
+    def _get_setting(self, key: str) -> Optional[str]:
         """Read settings from .arcconfig"""
         value = read_json_field(self._arcconfig_files, [key])
         return value
 
-    def _phab_url(self):
+    def _phab_url(self) -> str:
         """Determine the phab/conduit URL."""
 
         # In order of priority as per arc
@@ -92,12 +93,13 @@ class Repository(object):
         """Perform any repo-related cleanup tasks.
 
         May be called multiple times.
-        If an exception is raised this is NOT called (to avoid dataloss)."""
+        If an exception is raised this is NOT called (to avoid dataloss).
+        """
 
-    def finalize(self, commits):
+    def finalize(self, commits: List[dict]):
         """Update the history after node changed."""
 
-    def set_args(self, args):
+    def set_args(self, args: argparse.Namespace):
         if (
             hasattr(args, "single")
             and args.single
@@ -110,7 +112,7 @@ class Repository(object):
     def untracked(self):
         """Return a list of untracked files."""
 
-    def commit_stack(self, **kwargs):
+    def commit_stack(self, **kwargs) -> List[dict]:
         """Return list of commits.
 
         List of dicts with the following keys:
@@ -131,16 +133,16 @@ class Repository(object):
             author-email
         """
 
-    def refresh_commit_stack(self, commits):
+    def refresh_commit_stack(self, commits: List[dict]):
         """Update the stack following an altering change (eg rebase)."""
 
-    def is_node(self, node):
+    def is_node(self, node: str) -> bool:
         """Check if node exists.
 
         Returns a Boolean.
         """
 
-    def check_node(self, node):
+    def check_node(self, node: str) -> str:
         """Check if node exists.
 
         Returns a node if found.
@@ -148,10 +150,10 @@ class Repository(object):
         Raises NotFoundError if node not found in the repository.
         """
 
-    def checkout(self, node):
+    def checkout(self, node: str):
         """Checkout/Update to specified node."""
 
-    def commit(self, body):
+    def commit(self, body: str):
         """Commit the changes in the working directory."""
 
     def amend_commit(self, commit, commits):
@@ -170,10 +172,10 @@ class Repository(object):
     def uplift_commits(self, dest: str, commits: List[dict]) -> List[dict]:
         """Uplift the repo's revset onto `dest` and returns the refreshed `commits`."""
 
-    def rebase_commit(self, source_commit, dest_commit):
+    def rebase_commit(self, source_commit: dict, dest_commit: dict):
         """Rebase source onto destination."""
 
-    def before_patch(self, node, name):
+    def before_patch(self, node: str, name: str):
         """Prepare repository to apply the patches."""
 
     def apply_patch(self, diff, body, author, author_date):
