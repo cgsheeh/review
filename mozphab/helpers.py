@@ -180,12 +180,12 @@ def get_arcrc_path() -> str:
     return arcrc
 
 
-def parse_arc_diff_rev(body):
+def parse_arc_diff_rev(body: str) -> Optional[str]:
     m = ARC_DIFF_REV_RE.search(body)
     return m.group("rev") if m else None
 
 
-def strip_differential_revision(body):
+def strip_differential_revision(body: str) -> str:
     return ARC_DIFF_REV_RE.sub("", body).rstrip()
 
 
