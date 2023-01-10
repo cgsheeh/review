@@ -51,6 +51,7 @@ class Repository(object):
 
     def is_worktree_clean(self) -> bool:
         """Check if the working tree is clean."""
+        raise NotImplementedError("Missing implementation for `is_worktree_clean`.")
 
     def before_submit(self):
         """Executed before the submit commit."""
