@@ -13,7 +13,10 @@ from typing import (
     Optional,
 )
 
-from mozphab.conduit import conduit
+from mozphab.conduit import (
+    ConduitAPI,
+    require_conduit,
+)
 from mozphab.exceptions import Error
 from mozphab.logger import logger
 from mozphab.helpers import augment_commits_from_body, prompt
@@ -194,14 +197,10 @@ def convert_stackgraph_to_linear(
     return linear_stackgraph
 
 
-def reorganise(repo: Repository, args: argparse.Namespace):
+@require_conduit
+def reorganise(conduit: ConduitAPI, repo: Repository, args: argparse.Namespace):
     """Reorganise the stack on Phabricator to match the stack in the local VCS."""
     telemetry().submission.preparation_time.start()
-
-    with wait_message("Checking connection to Phabricator."):
-        # Check if raw Conduit API can be used
-        if not conduit.check():
-            raise Error("Failed to use Conduit API")
 
     # Find and preview commits to submits.
     with wait_message("Looking for commits.."):

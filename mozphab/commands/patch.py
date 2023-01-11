@@ -8,13 +8,17 @@ import subprocess
 
 from typing import List, Tuple
 
-from mozphab.conduit import conduit
+from mozphab.conduit import (
+    require_conduit,
+    ConduitAPI,
+)
 from mozphab.config import config
 from mozphab.exceptions import Error, NonLinearException, NotFoundError
 from mozphab.helpers import prepare_body, prompt, short_node
 from mozphab.logger import logger
 from mozphab.mercurial import Mercurial
 from mozphab.patch import apply_patch
+from mozphab.repository import Repository
 from mozphab.spinner import wait_message
 
 
@@ -67,7 +71,8 @@ def update_revision_with_new_diff(revs: List[dict], diff: dict) -> None:
     raise Error(f"Diff {diff['id']} is not related to any revision in the stack.")
 
 
-def patch(repo, args):
+@require_conduit
+def patch(conduit: ConduitAPI, repo: Repository, args: argparse.Namespace):
     """Patch repository from Phabricator's revisions.
 
     By default:
@@ -89,12 +94,6 @@ def patch(repo, args):
     * Error if base commit not found in repository
     * Error if `--diff-id` does not belong to any revision in the stack
     """
-    # Check if raw Conduit API can be used
-    with wait_message("Checking connection to Phabricator."):
-        # Check if raw Conduit API can be used
-        if not conduit.check():
-            raise Error("Failed to use Conduit API")
-
     if not args.raw:
         # Check if local and remote VCS matches
         with wait_message("Checking VCS"):

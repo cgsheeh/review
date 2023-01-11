@@ -4,6 +4,7 @@
 
 import base64
 import datetime
+import functools
 import hashlib
 import json
 import os
@@ -18,6 +19,7 @@ from typing import (
 )
 
 from mozphab import environment
+from mozphab.spinner import wait_message
 
 from .environment import USER_AGENT
 from .exceptions import (
@@ -828,6 +830,22 @@ class ConduitAPI:
             if "disabled" in r.get("roles", [])
         ]
         return disabled + unavailable + [dict(name=r) for r in invalid]
+
+
+def require_conduit(command_func):
+    """Command function wrapper to require Conduit availability."""
+
+    @functools.wraps(command_func)
+    def wrapper(*args, **kwargs):
+        conduit = ConduitAPI()
+
+        with wait_message("Checking connection to Phabricator."):
+            if not conduit.check():
+                raise Error("Failed to use Conduit API")
+
+        return command_func(conduit, *args, **kwargs)
+
+    return wrapper
 
 
 conduit = ConduitAPI()

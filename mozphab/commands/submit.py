@@ -8,7 +8,10 @@ from typing import List
 
 from mozphab import environment
 
-from mozphab.conduit import conduit
+from mozphab.conduit import (
+    require_conduit,
+    ConduitAPI,
+)
 from mozphab.config import config
 from mozphab.exceptions import Error
 from mozphab.helpers import (
@@ -472,15 +475,11 @@ def local_uplift_if_possible(
     return False
 
 
-def _submit(repo: Repository, args: argparse.Namespace):
+def _submit(conduit: ConduitAPI, repo: Repository, args: argparse.Namespace):
     telemetry().submission.preparation_time.start()
-    with wait_message("Checking connection to Phabricator."):
-        # Check if raw Conduit API can be used
-        if not conduit.check():
-            raise Error("Failed to use Conduit API")
 
-        # Check if local and remote VCS matches
-        repo.check_vcs()
+    # Check if local and remote VCS matches
+    repo.check_vcs()
 
     repo.before_submit()
 
@@ -702,9 +701,10 @@ def _submit(repo: Repository, args: argparse.Namespace):
     telemetry().submission.process_time.stop()
 
 
-def submit(repo: Repository, args: argparse.Namespace):
+@require_conduit
+def submit(conduit: ConduitAPI, repo: Repository, args: argparse.Namespace):
     try:
-        _submit(repo, args)
+        _submit(conduit, repo, args)
     except Exception as e:
         # Check if the `fallback` flag was set and print a warning message.
         if hasattr(args, "fallback") and args.fallback:
