@@ -315,7 +315,7 @@ def reorganise(repo: Repository, args: argparse.Namespace):
 
     with wait_message("Applying transactions..."):
         for phid, rev_transactions in transactions.items():
-            conduit.edit_revision(
+            conduit.edit_stack_relationships(
                 rev_id=phid,
                 transactions=rev_transactions,
             )

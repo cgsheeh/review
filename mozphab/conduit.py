@@ -590,6 +590,14 @@ class ConduitAPI:
 
         return revision
 
+    def edit_stack_relationships(self, rev_id: str, transactions: List[dict]) -> dict:
+        """Edit relationships between revisions via `differential.revision.edit`."""
+        revision = self.call(
+            "differential.revision.edit",
+            {"objectIdentifier": rev_id, "transactions": transactions},
+        )
+        return revision
+
     def get_repository_by_callsign(self, call_sign: str) -> dict:
         """Get repository info for a repo on Phabricator by callsign."""
         return self.repository_search_single("callsigns", call_sign)
