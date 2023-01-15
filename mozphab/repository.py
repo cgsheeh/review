@@ -55,9 +55,11 @@ class Repository(object):
 
     def before_submit(self):
         """Executed before the submit commit."""
+        raise NotImplementedError("Missing implementation for `before_submit`.")
 
     def after_submit(self):
         """Executed after the submit commit."""
+        raise NotImplementedError("Missing implementation for `after_submit`.")
 
     def _get_setting(self, key: str) -> Optional[str]:
         """Read settings from .arcconfig"""
@@ -96,9 +98,11 @@ class Repository(object):
         May be called multiple times.
         If an exception is raised this is NOT called (to avoid dataloss).
         """
+        raise NotImplementedError("Missing implementation for `cleanup`.")
 
     def finalize(self, commits: List[dict]):
         """Update the history after node changed."""
+        raise NotImplementedError("Missing implementation for `finalize`.")
 
     def set_args(self, args: argparse.Namespace):
         if (
@@ -112,6 +116,7 @@ class Repository(object):
 
     def untracked(self):
         """Return a list of untracked files."""
+        raise NotImplementedError("Missing implementation for `untracked`.")
 
     def commit_stack(self, **kwargs) -> List[dict]:
         """Return list of commits.
@@ -133,15 +138,18 @@ class Repository(object):
             author-name
             author-email
         """
+        raise NotImplementedError("Missing implementation for `commit_stack`.")
 
     def refresh_commit_stack(self, commits: List[dict]):
         """Update the stack following an altering change (eg rebase)."""
+        raise NotImplementedError("Missing implementation for `refresh_commit_stack`.")
 
     def is_node(self, node: str) -> bool:
         """Check if node exists.
 
         Returns a Boolean.
         """
+        raise NotImplementedError("Missing implementation for `is_node`.")
 
     def check_node(self, node: str) -> str:
         """Check if node exists.
@@ -150,18 +158,23 @@ class Repository(object):
 
         Raises NotFoundError if node not found in the repository.
         """
+        raise NotImplementedError("Missing implementation for `check_node`.")
 
     def checkout(self, node: str):
         """Checkout/Update to specified node."""
+        raise NotImplementedError("Missing implementation for `checkout`.")
 
     def commit(self, body: str):
         """Commit the changes in the working directory."""
+        raise NotImplementedError("Missing implementation for `commit`.")
 
     def amend_commit(self, commit, commits):
         """Amend commit description from `title` and `desc` fields"""
+        raise NotImplementedError("Missing implementation for `amend_commit`.")
 
     def is_descendant(self, node: str) -> bool:
         """Return `True` if the repository revset is descendant from `node`."""
+        raise NotImplementedError("Missing implementation for `is_descendant`.")
 
     def map_callsign_to_unified_head(self, callsign: str) -> Optional[str]:
         """Return the expected VCS identifier for the given callsign.
@@ -169,23 +182,33 @@ class Repository(object):
         Returns a VCS identifier that corresponds to the given Phabricator repository
         callsign. Confirms the identified head exists in the repository.
         """
+        raise NotImplementedError(
+            "Missing implementation for `map_callsign_to_unified_head`."
+        )
 
     def uplift_commits(self, dest: str, commits: List[dict]) -> List[dict]:
         """Uplift the repo's revset onto `dest` and returns the refreshed `commits`."""
+        raise NotImplementedError("Missing implementation for `uplift_commits`.")
 
     def rebase_commit(self, source_commit: dict, dest_commit: dict):
         """Rebase source onto destination."""
+        raise NotImplementedError("Missing implementation for `rebase_commit`.")
 
     def before_patch(self, node: str, name: str):
         """Prepare repository to apply the patches."""
+        raise NotImplementedError("Missing implementation for `before_patch`.")
 
-    def apply_patch(self, diff, body, author, author_date):
+    def apply_patch(self, diff: dict, body: str, author: str, author_date: str):
         """Apply the patch and commit the changes."""
+        raise NotImplementedError("Missing implementation for `apply_patch`.")
 
-    def format_patch(self, diff, body, author, author_date):
+    def format_patch(self, diff: dict, body: str, author: str, author_date: str):
         """Format a patch appropriate for importing."""
+        raise NotImplementedError("Missing implementation for `format_patch`.")
 
-    def check_commits_for_submit(self, commits, *, require_bug=True):
+    def check_commits_for_submit(
+        self, commits: List[dict], *, require_bug: bool = True
+    ):
         """Validate the list of commits (from commit_stack) are ok to submit"""
         errors = []
         warnings = []
@@ -300,7 +323,7 @@ class Repository(object):
         if unavailable_reviewers_warning:
             logger.warning("Notice: reviewer availability overridden.")
 
-    def _api_url(self):
+    def _api_url(self) -> str:
         """Return a base URL for conduit API call"""
         url = urllib.parse.urljoin(self.phab_url, "api/")
 
@@ -312,7 +335,7 @@ class Repository(object):
         return url
 
     @property
-    def phab_repo(self):
+    def phab_repo(self) -> dict:
         """Representation of the Repository in Phabricator API."""
         if not self._phab_repo:
             with wait_message("Reading repository data"):
@@ -321,7 +344,7 @@ class Repository(object):
         return self._phab_repo
 
     @property
-    def phid(self):
+    def phid(self) -> str:
         """PHID of the repository.
 
         This value does not change over time.
@@ -351,7 +374,7 @@ class Repository(object):
 
         return self._phid
 
-    def check_vcs(self):
+    def check_vcs(self) -> bool:
         """`Git.check_vcs` raises if cinnabar required and not installed."""
         if self.args.force_vcs:
             return True
@@ -366,7 +389,7 @@ class Repository(object):
         return True
 
     @property
-    def phab_vcs(self):
+    def phab_vcs(self) -> str:
         """Version Control System short name stored in Phabricator.
 
         This value does not change over time.
@@ -385,9 +408,10 @@ class Repository(object):
 
         return self._phab_vcs
 
-    def get_public_node(self, node):
+    def get_public_node(self, node: str) -> str:
         """Hashtag in a remote VCS."""
         return node
 
-    def validate_email(self):
+    def validate_email(self) -> bool:
         """Validate a user's configured email address."""
+        raise NotImplementedError("Missing implementation for `validate_email`.")
