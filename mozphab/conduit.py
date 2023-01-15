@@ -245,7 +245,7 @@ class ConduitAPI:
         raise NotFoundError("revision {} not found".format(phid))
 
     def get_revisions(
-        self, ids: Optional[List[int]] = None, phids: Optional[List[int]] = None
+        self, ids: Optional[List[int]] = None, phids: Optional[List[str]] = None
     ) -> List[dict]:
         """Get revisions info from Phabricator.
 
