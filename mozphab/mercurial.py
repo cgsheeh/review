@@ -1146,5 +1146,7 @@ class Mercurial(Repository):
 
     def extract_email_from_username(self) -> str:
         """Extracts an email from a Mercurial username, if it exists.
-        Not guaranteed to return a valid email, make sure to validate."""
+
+        Not guaranteed to return a valid email, make sure to validate.
+        """
         return self.username.split("<").pop().replace(">", "")
