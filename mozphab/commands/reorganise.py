@@ -75,7 +75,7 @@ def walk_llist(
 
 
 def stack_transactions(
-    remote_phids: List[str], local_phids: List[str]
+    remote_phids: List[str], local_phids: List[str], phid_to_revision: dict[str, dict]
 ) -> Dict[str, List[Dict]]:
     """Prepare transactions to set the stack as provided in local_phids.
 
@@ -137,6 +137,10 @@ def stack_transactions(
 
     # Abandon
     for revision in remote_revisions_missing_from_local:
+        # Avoid abandoning a revision if it is already in `abandoned` state.
+        if phid_to_revision[revision]["fields"]["status"]["value"] == "abandoned":
+            continue
+
         transactions[revision].append(("abandon", True))
         del remote_list[revision]
         walk_llist(remote_list, allow_multiple_heads=True)
@@ -159,7 +163,7 @@ def stack_transactions(
 
 def convert_stackgraph_to_linear(
     stack_graph: Dict[str, List[str]],
-    phid_to_id: Dict[str, int],
+    phid_to_revision: Dict[str, dict],
 ) -> Dict[str, Optional[str]]:
     """Converts the `stackGraph` data from Phabricator to a linear format.
 
@@ -173,7 +177,7 @@ def convert_stackgraph_to_linear(
             # that node has multiple children.
             if predecessor_phid in linear_stackgraph:
                 # Get the ID of the revision with multiple children.
-                rev_id = phid_to_id[predecessor_phid]
+                rev_id = phid_to_revision[predecessor_phid]["id"]
 
                 raise Error(f"Revision D{rev_id} has multiple children.")
 
@@ -240,18 +244,18 @@ def reorganise(repo: Repository, args: argparse.Namespace):
     if not revisions:
         raise Error("Could not find revisions on Phabricator.")
 
-    # Merge all the existing stackgraph's into one. Any repeated keys
+    # Merge all the existing stackgraphs into one. Any repeated keys
     # will have the same values.
     stack_graph = {
         predecessor: successors
         for revision in revisions
         for predecessor, successors in revision["fields"]["stackGraph"].items()
     }
-    phid_to_id = {revision["phid"]: revision["id"] for revision in revisions}
+    phid_to_revision = {revision["phid"]: revision for revision in revisions}
 
     try:
         # Validate the `stackGraph` field from our remote revisions.
-        phabstack = convert_stackgraph_to_linear(stack_graph, phid_to_id)
+        phabstack = convert_stackgraph_to_linear(stack_graph, phid_to_revision)
     except Error:
         logger.error("Remote stack is not linear.")
         raise
@@ -272,7 +276,9 @@ def reorganise(repo: Repository, args: argparse.Namespace):
 
     localstack_phids = conduit.ids_to_phids(localstack_ids)
     try:
-        transactions = stack_transactions(phabstack_phids, localstack_phids)
+        transactions = stack_transactions(
+            phabstack_phids, localstack_phids, phid_to_revision
+        )
     except Error:
         logger.error("Unable to prepare stack transactions.")
         raise
