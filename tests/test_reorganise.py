@@ -190,8 +190,11 @@ from mozphab.commands import reorganise
         (("A", "B"), {"A": [{"type": "abandon", "value": True}]}, set()),
     ],
 )
-def test_prepare_transactions(phids, transactions, abandoned):
+def test_stack_transactions(phids, transactions, abandoned):
     remote_phids, local_phids = phids
+    # TODO make this work with `--no-abandon` and test
+    # TODO test this works against a test stack. Should avoid
+    # abandoning revision after dropping from stack.
     assert (
         reorganise.stack_transactions(remote_phids, local_phids, abandoned)
         == transactions
