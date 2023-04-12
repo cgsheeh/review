@@ -9,6 +9,7 @@ import concurrent.futures
 from typing import (
     Any,
     Dict,
+    List,
 )
 
 from .conduit import conduit
@@ -18,7 +19,15 @@ class Diff:
     """Representation of the Diff used to submit to the Phabricator."""
 
     class Hunk:
-        def __init__(self, *, old_off, old_len, new_off, new_len, lines):
+        def __init__(
+            self,
+            *,
+            old_off: int,
+            old_len: int,
+            new_off: int,
+            new_len: int,
+            lines: List[str],
+        ):
             """
             Hunk object, encapsulates hunk metadata and diff lines.
 
@@ -64,7 +73,7 @@ class Diff:
                 prev_line = line
 
     class Change:
-        def __init__(self, path):
+        def __init__(self, path: str):
             self.old_mode = None
             self.cur_mode = None
             self.old_path = None
@@ -77,14 +86,14 @@ class Diff:
             self.hunks = []
 
         @property
-        def added(self):
+        def added(self) -> int:
             return sum(hunk.added for hunk in self.hunks)
 
         @property
-        def deleted(self):
+        def deleted(self) -> int:
             return sum(hunk.deleted for hunk in self.hunks)
 
-        def from_git_diff(self, git_diff):
+        def from_git_diff(self, git_diff: str):
             """Generate hunks from the provided git_diff output."""
 
             # Process each hunk
@@ -118,7 +127,7 @@ class Diff:
             if hunk and hunk["lines"]:
                 self.hunks.append(Diff.Hunk(**hunk))
 
-        def set_as_binary(self, *, a_body, a_mime, b_body, b_mime):
+        def set_as_binary(self, *, a_body: str, a_mime: str, b_body: str, b_mime: str):
             """Updates Change contents to the provided binary data."""
             self.binary = True
 
@@ -184,7 +193,7 @@ class Diff:
             MULTICOPY=8,
         )
 
-        def __init__(self, name):
+        def __init__(self, name: str):
             self.value = self.values[name]
             self.name = name
 
@@ -217,7 +226,7 @@ class Diff:
             NORMAL=7,
         )
 
-        def __init__(self, name):
+        def __init__(self, name: str):
             self.value = self.values[name]
             self.name = name
 
@@ -226,12 +235,20 @@ class Diff:
         self.phid = None
         self.id = None
 
-    def change_for(self, path):
+    def change_for(self, path: str):
         if path not in self.changes:
             self.changes[path] = self.Change(path)
         return self.changes[path]
 
-    def set_change_kind(self, change, kind, a_mode, b_mode, a_path, _b_path):
+    def set_change_kind(
+        self,
+        change: Change,
+        kind: str,
+        a_mode: int,
+        b_mode: int,
+        a_path: str,
+        _b_path: str,
+    ):
         """Determine the correct kind from the letter."""
         if kind == "A":
             change.kind = self.Kind("ADD")
