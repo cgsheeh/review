@@ -206,7 +206,7 @@ class ConduitAPI:
         Returns:
             A list of PHIDs.
         """
-        return [r["phid"] for r in self.get_revisions(ids=rev_ids)]
+        return [rev["phid"] for rev in self.get_revisions(ids=rev_ids)]
 
     def id_to_phid(self, rev_id: int) -> str:
         """Convert revision id to PHID."""
@@ -225,7 +225,7 @@ class ConduitAPI:
         Returns:
             A list of ids.
         """
-        return ["D{}".format(r["id"]) for r in self.get_revisions(phids=phids)]
+        return ["D{}".format(rev["id"]) for rev in self.get_revisions(phids=phids)]
 
     def phid_to_id(self, phid: str) -> str:
         """Convert revision PHID to id."""
@@ -289,11 +289,11 @@ class ConduitAPI:
             response = self.call("differential.revision.search", api_call_args)
             rev_list = response.get("data")
 
-            for r in rev_list:
-                phids_by_id[str(r["id"])] = r["phid"]
-                revisions[r["phid"]] = r
-                cache.set("rev-id-%s" % r["id"], r["phid"])
-                cache.set("rev-%s" % r["phid"], r)
+            for rev in rev_list:
+                phids_by_id[str(rev["id"])] = rev["phid"]
+                revisions[rev["phid"]] = rev
+                cache.set("rev-id-%s" % rev["id"], rev["phid"])
+                cache.set("rev-%s" % rev["phid"], rev)
 
         # Return revisions in the same order requested.
         if ids:
@@ -333,8 +333,8 @@ class ConduitAPI:
         diff_list = response.get("data", [])
 
         diff_dict = {}
-        for d in diff_list:
-            diff_dict[d["phid"]] = d
+        for diff in diff_list:
+            diff_dict[diff["phid"]] = diff
 
         return diff_dict
 
@@ -375,9 +375,9 @@ class ConduitAPI:
 
         revisions = self.get_revisions(phids=result)
         return [
-            r["phid"]
-            for r in revisions
-            if r["fields"]["status"]["value"] != "abandoned"
+            rev["phid"]
+            for rev in revisions
+            if rev["fields"]["status"]["value"] != "abandoned"
         ]
 
     def get_users(self, usernames: List[str]) -> List[dict]:
@@ -389,12 +389,12 @@ class ConduitAPI:
         to_collect = []
         users = []
         for user in usernames:
-            u = user.rstrip("!")
-            key = "user-%s" % u
+            user_without_blocking = user.rstrip("!")
+            key = "user-%s" % user_without_blocking
             if key in cache:
                 users.append(cache.get(key))
             else:
-                to_collect.append(u)
+                to_collect.append(user_without_blocking)
 
         if not to_collect:
             return users
@@ -416,12 +416,12 @@ class ConduitAPI:
         to_collect = []
         groups = []
         for slug in slugs:
-            s = slug.rstrip("!")
-            key = "group-%s" % s
+            slug_without_blocking = slug.rstrip("!")
+            key = "group-%s" % slug_without_blocking
             if key in cache:
                 groups.append(cache.get(key))
             else:
-                to_collect.append(s)
+                to_collect.append(slug_without_blocking)
 
         if not to_collect:
             return groups
@@ -733,20 +733,28 @@ class ConduitAPI:
         all_reviewing = commit["reviewers"]["request"] + commit["reviewers"]["granted"]
 
         # Find reviewers PHIDs
-        all_reviewers = [r for r in all_reviewing if not r.startswith("#")]
+        all_reviewers = [
+            reviewer for reviewer in all_reviewing if not reviewer.startswith("#")
+        ]
         # preload all reviewers
         self.get_users(all_reviewers)
-        reviewers = [r for r in all_reviewers if not r.endswith("!")]
-        blocking_reviewers = [r.rstrip("!") for r in all_reviewers if r.endswith("!")]
+        reviewers = [
+            reviewer for reviewer in all_reviewers if not reviewer.endswith("!")
+        ]
+        blocking_reviewers = [
+            reviewer.rstrip("!") for reviewer in all_reviewers if reviewer.endswith("!")
+        ]
         reviewers_phid = [user["phid"] for user in self.get_users(reviewers)]
         blocking_phid = [
             "blocking(%s)" % user["phid"] for user in self.get_users(blocking_reviewers)
         ]
 
         # Find groups PHIDs
-        all_groups = [g for g in all_reviewing if g.startswith("#")]
-        groups = [g for g in all_groups if not g.endswith("!")]
-        blocking_groups = [g.rstrip("!") for g in all_groups if g.endswith("!")]
+        all_groups = [group for group in all_reviewing if group.startswith("#")]
+        groups = [group for group in all_groups if not group.endswith("!")]
+        blocking_groups = [
+            group.rstrip("!") for group in all_groups if group.endswith("!")
+        ]
         # preload all groups
         self.get_groups(all_groups)
         groups_phid = [group["phid"] for group in self.get_groups(groups)]
@@ -772,9 +780,9 @@ class ConduitAPI:
         for sublist in list(reviewers.values()):
             all_reviewers.extend(
                 [
-                    normalise_reviewer(r, strip_group=False)
-                    for r in sublist
-                    if not r.startswith("#")
+                    normalise_reviewer(reviewer, strip_group=False)
+                    for reviewer in sublist
+                    if not reviewer.startswith("#")
                 ]
             )
 
@@ -792,9 +800,9 @@ class ConduitAPI:
         for sublist in list(reviewers.values()):
             all_groups.extend(
                 [
-                    normalise_reviewer(r, strip_group=False)
-                    for r in sublist
-                    if r.startswith("#")
+                    normalise_reviewer(reviewer, strip_group=False)
+                    for reviewer in sublist
+                    if reviewer.startswith("#")
                 ]
             )
 
@@ -811,22 +819,22 @@ class ConduitAPI:
         # Find users availability:
         unavailable = [
             dict(
-                name=r["userName"],
-                until=datetime.datetime.fromtimestamp(r["currentStatusUntil"]).strftime(
-                    "%Y-%m-%d %H:%M"
-                ),
+                name=user["userName"],
+                until=datetime.datetime.fromtimestamp(
+                    user["currentStatusUntil"]
+                ).strftime("%Y-%m-%d %H:%M"),
             )
-            for r in users
-            if r.get("currentStatus") == "away"
+            for user in users
+            if user.get("currentStatus") == "away"
         ]
 
         # Find disabled users:
         disabled = [
-            dict(name=r["userName"], disabled=True)
-            for r in users
-            if "disabled" in r.get("roles", [])
+            dict(name=user["userName"], disabled=True)
+            for user in users
+            if "disabled" in user.get("roles", [])
         ]
-        return disabled + unavailable + [dict(name=r) for r in invalid]
+        return disabled + unavailable + [dict(name=user) for user in invalid]
 
 
 conduit = ConduitAPI()
