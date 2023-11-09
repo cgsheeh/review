@@ -124,21 +124,40 @@ jobs:
     steps:
       - checkout
       - run:
-          name: install dependencies
+          name: Install specific Python with pyenv-win
+          shell: powershell.exe
           command: |
+            Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1
+            choco install pyenv-win --force -y
+            refreshenv
+            pyenv update
+            pyenv install 3.7.9
+            pyenv rehash
+            pyenv local 3.7.9
+            $env:Path = 'C:\Users\circleci\.pyenv\pyenv-win\bin;C:\Users\circleci\.pyenv\pyenv-win\shims;' + $env:Path
+            python --version
+      - run:
+          name: install dependencies
+          shell: powershell.exe
+          command: |
+            refreshenv
             pip install --disable-pip-version-check --requirement dev/requirements/windows.txt
             pip install --disable-pip-version-check --editable .
             git config --global user.email "moz-phab-tests@example.com"
             git config --global user.name "moz-phab tests"
       - run:
           name: versions
+          shell: powershell.exe
           command: |
+            refreshenv
             python --version
             git --version
             pip --disable-pip-version-check list --format freeze
       - run:
           name: run tests
+          shell: powershell.exe
           command: |
+            refreshenv
             mkdir test-reports
             function RunTest {
               & python -m pytest -vv @args
