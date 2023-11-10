@@ -124,6 +124,13 @@ jobs:
     steps:
       - checkout
       - run:
+          shell: bash
+          name: Use Python 3.8
+          command: |
+            py -3.8 -m venv venv38
+            source ./venv38/Scripts/activate
+            python --version
+      - run:
           name: install dependencies
           command: |
             pip install --disable-pip-version-check --requirement dev/requirements/windows.txt
