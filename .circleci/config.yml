@@ -124,21 +124,21 @@ jobs:
     steps:
       - checkout
       - run:
-          name: install dependencies
+          name: install lowest supported Python version
           command: |
+            choco uninstall python --force -y
+            choco uninstall python3 --force -y
+            choco install python --version=3.7.9 --force -y
+            py -3.7 -m venv venv37
+            source ./venv37/Scripts/activate
+            python --version
             pip install --disable-pip-version-check --requirement dev/requirements/windows.txt
             pip install --disable-pip-version-check --editable .
             git config --global user.email "moz-phab-tests@example.com"
             git config --global user.name "moz-phab tests"
-      - run:
-          name: versions
-          command: |
             python --version
             git --version
             pip --disable-pip-version-check list --format freeze
-      - run:
-          name: run tests
-          command: |
             mkdir test-reports
             function RunTest {
               & python -m pytest -vv @args
