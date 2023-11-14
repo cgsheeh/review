@@ -72,7 +72,7 @@ jobs:
             git config --global user.email "moz-phab-tests@example.com"
             git config --global user.name "moz-phab tests"
             # install test dependencies
-            pip install --upgrade pip
+            pip install --upgrade pip virtualenv
             pip install --requirement $(echo $REQUIREMENTS_FILE)
             pip install --editable .
       - run:
