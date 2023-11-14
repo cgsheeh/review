@@ -2,10 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from pathlib import Path
 import subprocess
+import sys
 
-from .conftest import find_script_path
+from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -18,12 +18,12 @@ PY_FILES = sorted(
 
 
 def test_black():
-    subprocess.check_call([find_script_path("black"), "--check"] + PY_FILES)
+    subprocess.check_call([sys.executable, "-m", "black", "--check"] + PY_FILES)
 
 
 def test_flake8():
     subprocess.check_call(
-        [find_script_path("flake8")]
+        [sys.executable, "-m", "flake8"]
         + ["--max-line-length=88"]
         + ["--ignore=E203,W503"]
         + ["--disable-noqa"]

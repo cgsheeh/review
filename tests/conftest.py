@@ -6,7 +6,6 @@ import json
 import os
 import pytest
 import re
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -212,21 +211,6 @@ def write_text(filename, content, **kwargs):
     # Always write LF delimited text
     with io.open(filename, "w", newline="\n", **kwargs) as f:
         f.write(content)
-
-
-def find_script_path(name):
-    """Return the fully qualified path to an executable, preferring those installed
-    into the current virtualenv."""
-    bin_path = Path(sys.executable).parent
-    if sys.platform == "win32":
-        name = "%s.exe" % name
-    filename = bin_path / name
-    if filename.exists():
-        return str(filename)
-    # Check system path
-    if shutil.which(name):
-        return name
-    raise Exception("Failed to find script: %s" % filename)
 
 
 @pytest.fixture
