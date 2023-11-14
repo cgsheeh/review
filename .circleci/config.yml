@@ -85,8 +85,7 @@ jobs:
             which python
             which black
             which flake8
-            black --version
-            black --check tests/test_style.py
+            python -m black --check tests/test_style.py
       - run:
           name: run tests
           command: |
