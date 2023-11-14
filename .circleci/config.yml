@@ -82,6 +82,7 @@ jobs:
             python3 --version
             git --version
             pip --disable-pip-version-check list --format freeze
+            black --version
       - run:
           name: run tests
           command: |
