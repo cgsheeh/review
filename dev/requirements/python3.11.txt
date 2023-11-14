@@ -87,8 +87,8 @@ funcsigs==1.0.2 \
     --hash=sha256:330cc27ccbf7f1e992e69fef78261dc7c6569012cf397db8d3de0234e6c937ca \
     --hash=sha256:a7bb0f2cf3a3fd1ab2732cb49eba4252c2af4240442415b4abce3b87022a8f50
     # via -r dev/requirements/base.in
-hg-evolve==10.2.0.post1 \
-    --hash=sha256:391aa877a61ed04c58b8d82d465b3771f632bb9b19f22cbf18f0e5a1f42f8d4e
+hg-evolve==11.1.0 \
+    --hash=sha256:b0cbc7bc7c0bb8c4f42da1f65c50de3ee78f6f00978ef97ae9019d11147493a8
     # via -r dev/requirements/base.in
 immutabledict==1.0.0 \
     --hash=sha256:a768690210d107d5a479a5edf9e09e70db7cfbe6aee45c82b5799f82b43bf739 \
