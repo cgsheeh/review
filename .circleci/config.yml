@@ -82,6 +82,9 @@ jobs:
             python3 --version
             git --version
             pip --disable-pip-version-check list --format freeze
+            which python
+            which black
+            which flake8
       - run:
           name: run tests
           command: |
