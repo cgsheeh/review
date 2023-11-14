@@ -114,6 +114,12 @@ jobs:
       - REQUIREMENTS_FILE: dev/requirements/python3.10.txt
     docker:
       - image: cimg/python:3.10
+  test_3_11:
+    <<: *test_template
+    environment:
+      - REQUIREMENTS_FILE: dev/requirements/python3.11.txt
+    docker:
+      - image: cimg/python:3.11
 
   test_win:
     executor:
