@@ -52,11 +52,50 @@ workflows:
 
 jobs:
   test_3_8: &test_template
-    <<: *test_template
     environment:
       - REQUIREMENTS_FILE: dev/requirements/python3.8.txt
     docker:
       - image: cimg/python:3.8
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run:
+          name: setup
+          command: |
+            set -e
+            mkdir -p ~/test-reports
+            mkdir -p ~/coredumps
+            # configure hg
+            echo -e "[ui]\nusername=mozphab test <moz-phab@example.com>" > ~/.hgrc
+            echo -e "[extensions]\nevolve=" >> ~/.hgrc
+            # configure git
+            git config --global user.email "moz-phab-tests@example.com"
+            git config --global user.name "moz-phab tests"
+            # install test dependencies
+            pip install --disable-pip-version-check --requirement $(echo $REQUIREMENTS_FILE)
+            pip install --disable-pip-version-check --editable .
+      - run:
+          name: versions
+          command: |
+            set -e
+            python3 --version
+            git --version
+            pip --disable-pip-version-check list --format freeze
+      - run:
+          name: run tests
+          command: |
+            set -e
+            ulimit -c unlimited
+            for F in tests/test_*.py; do
+              pytest --junitxml=~/test-reports/junit-$( basename $F .py ).xml -vv $F
+            done
+            cp core.* ~/coredumps || true
+      - store_test_results:
+          path: ~/test-reports
+      - store_artifacts:
+          path: ~/test-reports
+      - store_artifacts:
+          path: ~/coredumps
   test_3_9:
     <<: *test_template
     environment:
