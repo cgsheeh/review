@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import subprocess
-import sys
 
 from pathlib import Path
 
@@ -18,12 +17,12 @@ PY_FILES = sorted(
 
 
 def test_black():
-    subprocess.check_call([sys.executable, "-m", "black", "--check"] + PY_FILES)
+    subprocess.check_call(["black", "--check"] + PY_FILES)
 
 
 def test_flake8():
     subprocess.check_call(
-        [sys.executable, "-m", "flake8"]
+        ["flake8"]
         + ["--max-line-length=88"]
         + ["--ignore=E203,W503"]
         + ["--disable-noqa"]
