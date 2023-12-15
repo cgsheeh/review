@@ -33,8 +33,14 @@ class Commit:
     parent: Optional[str] = None
     bug_id: Optional[int] = None
     bug_id_orig: Optional[int] = None
-    has_reviewers: Optional[bool] = None
     rev_id: Optional[int] = None
     wip: Optional[bool] = None
     tree_hash: Optional[str] = None
     reviewers: Dict[str, List[str]] = field(default_factory=dict)
+
+    def has_reviewers(self) -> bool:
+        """Return `True` if the commit has reviewers."""
+        if not self.reviewers:
+            return False
+
+        return bool(self.reviewers.get("granted") or self.reviewers.get("request"))
