@@ -363,8 +363,8 @@ def update_commits_from_args(commits: List[Commit], args: argparse.Namespace):
         else:
             granted = commit.reviewers.get("granted", [])
             requested = commit.reviewers.get("request", [])
+
         commit.reviewers = dict(granted=granted, request=requested)
-        commit.has_reviewers = bool(granted + requested)
 
         if args.bug:
             # Bug ID command arg used.
