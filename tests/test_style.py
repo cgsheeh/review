@@ -21,11 +21,16 @@ def test_black():
     subprocess.check_call([find_script_path("black"), "--check"] + PY_FILES)
 
 
-def test_flake8():
-    subprocess.check_call(
-        [find_script_path("flake8")]
-        + ["--max-line-length=88"]
-        + ["--ignore=E203,W503"]
-        + ["--disable-noqa"]
-        + PY_FILES
-    )
+def test_ruff():
+    """Run ruff on lint paths."""
+    for lint_path in PY_FILES:
+        subprocess.call(
+            (
+                find_script_path("ruff"),
+                "check",
+                "--fix",
+                "--target-version",
+                "py38",
+                lint_path,
+            )
+        )
