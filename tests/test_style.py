@@ -18,6 +18,7 @@ PY_FILES = sorted(
 
 
 def test_black():
+    print(subprocess.check_call([sys.executable, "-m", "pip", "freeze"]))
     subprocess.check_call([sys.executable, "-m", "black", "--check"] + PY_FILES)
 
 
