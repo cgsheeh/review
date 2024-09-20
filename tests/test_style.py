@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import subprocess
+import sys
 from pathlib import Path
 
 from .conftest import find_script_path
@@ -17,7 +18,7 @@ PY_FILES = sorted(
 
 
 def test_black():
-    subprocess.check_call([find_script_path("black"), "--check"] + PY_FILES)
+    subprocess.check_call([sys.executable, "-m", "black", "--check"] + PY_FILES)
 
 
 def test_ruff():
