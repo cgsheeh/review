@@ -91,9 +91,8 @@ jobs:
             set -e
             source ~/venv/bin/activate
             ulimit -c unlimited
-            which black && black --version
             for F in tests/test_*.py; do
-              python3 -m pytest --junitxml=~/test-reports/junit-$( basename $F .py ).xml -vv $F
+              pytest --junitxml=~/test-reports/junit-$( basename $F .py ).xml -vv $F
             done
             cp core.* ~/coredumps || true
       - store_test_results:
