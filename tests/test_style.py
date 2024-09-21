@@ -19,24 +19,7 @@ PY_FILES = sorted(
 
 
 def test_black():
-    print(f"pytest {sys.executable=}")
-    print(f"pytest {os.getenv('PYTHONPATH')=}")
-
-    print(subprocess.check_call([sys.executable, "-m", "pip", "freeze"]))
-
-    # subprocess.check_call([sys.executable, "-c", "import click"])
-
-    try:
-        import click  # noqa: F401
-
-        print("click imported without error")
-    except ImportError as e:
-        print(f"error importing click: {str(e)}")
-
-    subprocess.check_call([sys.executable, "-m", "black", "--version"])
-    subprocess.check_call(["black", "--version"])
-    subprocess.check_call([find_script_path("black"), "--version"])
-    subprocess.check_call([sys.executable, "-m", "black", "--check"] + PY_FILES)
+    subprocess.check_call([find_script_path("black"), "--check"] + PY_FILES)
 
 
 def test_ruff():
