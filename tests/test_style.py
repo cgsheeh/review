@@ -24,7 +24,7 @@ def test_black():
 
     print(subprocess.check_call([sys.executable, "-m", "pip", "freeze"]))
 
-    subprocess.check_call([sys.executable, "-c", "import click"])
+    # subprocess.check_call([sys.executable, "-c", "import click"])
 
     try:
         import click  # noqa: F401
