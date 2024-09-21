@@ -82,10 +82,7 @@ jobs:
           command: |
             set -e
             source ~/venv/bin/activate
-            pyenv version
-            pyenv virtualenv --help
             python3 --version
-            which python3
             git --version
             python3 -m pip --disable-pip-version-check list --format freeze
       - run:
