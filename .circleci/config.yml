@@ -134,6 +134,8 @@ jobs:
       - run:
           name: install dependencies
           command: |
+            python3 -m venv ~/venv
+            source ~/venv/bin/activate
             pip install --disable-pip-version-check --requirement dev/requirements/windows.txt
             pip install --disable-pip-version-check --editable .
             git config --global user.email "moz-phab-tests@example.com"
@@ -141,12 +143,14 @@ jobs:
       - run:
           name: versions
           command: |
+            source ~/venv/bin/activate
             python --version
             git --version
             pip --disable-pip-version-check list --format freeze
       - run:
           name: run tests
           command: |
+            source ~/venv/bin/activate
             mkdir test-reports
             function RunTest {
               & python -m pytest -vv @args
