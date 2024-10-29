@@ -4,6 +4,11 @@
 
 import subprocess
 from pathlib import Path
+from typing import List, Tuple
+
+import pytest
+
+from mozphab.helpers import parse_bugs
 
 from .conftest import find_script_path
 
@@ -35,3 +40,25 @@ def test_ruff():
             ROOT,
         )
     )
+
+
+def get_commit_info() -> List[Tuple[str, str]]:
+    git_out = subprocess.run(
+        ["git", "log", "origin/main..HEAD", "--pretty=%H %s"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    return [
+        (line.split(" ", 1)[0], line.split(" ", 1)[1])
+        for line in git_out.stdout.strip().split("\n")
+    ]
+
+
+@pytest.mark.parametrize("commit_sha,commit_message", get_commit_info())
+def test_bug_number(commit_sha: str, commit_message: str):
+    """Enforce bug numbers in un-landed commit messages."""
+    assert parse_bugs(
+        commit_message
+    ), f"Commit {commit_sha} does not have a bug number."
