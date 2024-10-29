@@ -43,6 +43,7 @@ def test_ruff():
 
 
 def get_commit_info() -> List[Tuple[str, str]]:
+    """Return a list of (commit sha, commit message) tuples since `origin/main`."""
     git_out = subprocess.run(
         ["git", "log", "origin/main..HEAD", "--pretty=%H %s"],
         capture_output=True,
