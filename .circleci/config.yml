@@ -61,7 +61,8 @@ jobs:
       - image: cimg/python:3.9
     working_directory: ~/repo
     steps:
-      - checkout
+      - checkout:
+          method: "blobless"
       - run:
           name: setup
           command: |
