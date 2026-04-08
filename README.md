@@ -325,7 +325,7 @@ version management. Install `uv` by following the
    and install the project with all dev dependencies.
 
 3. To run moz-phab after making modifications use `uv run moz-phab`
-4. To run tests use `uv run pytest -vv`
+4. To run tests use `uv run pytest -vv`. Use `-n auto` to run tests in parallel.
 5. To run tests against a specific Python version use `uv run --python 3.12 pytest -vv`
 
 ### Updating dependencies

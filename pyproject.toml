@@ -56,6 +56,7 @@ dev = [
     "immutabledict==4.2.0",
     "mercurial==6.8.2",
     "pytest==8.3.3",
+    "pytest-xdist",
     "ruff==0.14.0",
 ]
 
