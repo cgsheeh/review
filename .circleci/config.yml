@@ -92,6 +92,7 @@ jobs:
           name: versions
           command: |
             set -e
+            uv self version
             uv run python3 --version
             git --version
             jj --version
@@ -152,6 +153,7 @@ jobs:
       - run:
           name: versions
           command: |
+            uv self version
             uv run python --version
             git --version
             uv pip list
