@@ -70,7 +70,7 @@ jobs:
             mkdir -p ~/test-reports
             mkdir -p ~/coredumps
             # Install project and dev dependencies.
-            uv sync --group dev
+            uv sync --group dev --locked
             # Configure hg.
             echo -e "[ui]\nusername=mozphab test <moz-phab@example.com>" > ~/.hgrc
             echo -e "[extensions]\nevolve=" >> ~/.hgrc
